@@ -1,0 +1,60 @@
+body{
+    margin: 0;
+    padding: 0;
+    background-color: #fefefefe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100svw;
+    height: 100vh;
+}
+
+h1{
+    color: black;
+}
+
+
+canvas{
+    border: 1px solid black;
+}
+
+.toolkit{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-right: 15px;
+    border: 1px solid #CDCDCD;
+}
+
+
+
+.zoom{
+    background-color: #FFFFFF;
+    margin-left: 15px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 2px;
+    border: 1px solid #CDCDCD;
+}
+
+.active{
+    background-color: #64748B;
+    color: white;
+    transition: ease-in-out 0.2s;
+}
+
+button{
+    border: none;
+    outline: none;
+    padding: 10px;
+    color: #64748B;
+    background-color: #FFFFFF;
+}
+
+button:hover{
+    background-color: #64748B;
+    color: white;
+    transition: ease-in-out 0.3s;
+}

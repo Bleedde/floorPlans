@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+
+    <div class="toolkit">
+        <button class="drag" id="drag">Drag ☩</button>
+        <button onclick="createRect(canvas)">Square</button>
+        <button onclick="createCircle(canvas)">Circle</button>
+    </div>
+
+    <canvas id="canvas"></canvas>
+    <div class="zoom">
+        <button id="zoomIn">+</button>
+        <button id="zoomOut">-</button>
+    </div>
+
+
+
+    <script src="https://unpkg.com/fabric@5.3.0/dist/fabric.min.js"></script>
+    <script src="index.js"></script>
+</body>
+
+</html>

@@ -11,18 +11,20 @@
 <body>
 
     <div class="toolkit">
-        <button class="drag" id="drag">Drag ☩</button>
+        <button class="drag" id="drag" onclick="drag()">Drag ☩</button>
         <button onclick="createRect(canvas)">Square</button>
         <button onclick="createCircle(canvas)">Circle</button>
+        <button onclick="clearCanvas(canvas, svgState)">Clear</button>
+        <button onclick="restoreCanvas(canvas, svgState, bgUrl)">Restore</button>
+        <button onclick="resetCanvasPosition()">Reset position</button>
     </div>
 
     <canvas id="canvas"></canvas>
     <div class="zoom">
-        <button id="zoomIn">+</button>
-        <button id="zoomOut">-</button>
+        <button id="zoomIn" onclick="zoomIn()">+</button>
+        <button id="zoomOut" onclick="zoomOut()">-</button>
     </div>
-
-
+    <button onclick="resetZoom()">reset zoom</button>
 
     <script src="https://unpkg.com/fabric@5.3.0/dist/fabric.min.js"></script>
     <script src="index.js"></script>

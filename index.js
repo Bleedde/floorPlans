@@ -1,50 +1,66 @@
 let zoomLevel = 1;
 let isDraging = false;
+let mousePressed = false;
+var element = document.getElementById("drag");
+let initialCanvasPosition = { left: 0, top: 0 };
 
+const svgState = {}
 
+let bgUrl = 'https://i.pinimg.com/736x/d6/17/80/d61780ee78a35d5f4a92233d128b71bf.jpg'
+// https://i.pinimg.com/736x/d6/17/80/d61780ee78a35d5f4a92233d128b71bf.jpg
+
+// reference canvas element (with id="canvas on the html")
 const initCanvas = (id) => {
     return new fabric.Canvas(id, {
-        width: 600,
+        width: 800,
         height: 520,
-        backgroundColor: "white",
-        selection: false
+        selection: false,
     });
-}
+ }
+
 
 const setBackground = (url, canvas) => {
     fabric.Image.fromURL(url, (img) => {
-        canvas.backgroundImage = img
-        canvas.renderAll();
-    })
+        // Calcula el factor de escala para ajustar la imagen al tamaño del lienzo
+        // const scaleX = canvas.width / img.width;
+        // const scaleY = canvas.height / img.height;
+        // Establece la imagen de fondo y aplica el escalado
+        canvas.setBackgroundImage(
+            img,
+            canvas.renderAll.bind(canvas),
+            {
+                originX: "center",
+                originY: "center",
+                top: canvCenter.top,
+                left: canvCenter.left,
+                // usa las constantes declaradas anteriormente para escalar la imagen al tamaño del lienzo
+                // scaleX: scaleX,
+                // scaleY: scaleY
+            }
+        );
+    });
 }
 
-const handleZoomIn = () => {
-    setZoomLevel(zoomLevel + 0.1);
-    canvas.setZoom(zoomLevel + 0.1);
-};
 
-const handleZoomOut = () => {
-    if (zoomLevel > 0.1) {
-        setZoomLevel(zoomLevel - 0.1);
-        canvas.setZoom(zoomLevel - 0.1);
-    }
-};
-
-document.getElementById('zoomIn').addEventListener('click', () => {
+const zoomIn = () => {
     zoomLevel = zoomLevel + 0.1;
     canvas.setZoom(zoomLevel + 0.1);
-})
+}
 
-document.getElementById('zoomOut').addEventListener('click', () => {
+const zoomOut = () => {
     if (zoomLevel > 0.1) {
         zoomLevel = zoomLevel - 0.1;
         canvas.setZoom(zoomLevel - 0.1);
     }
-})
+}
 
-document.getElementById('drag').addEventListener('click', () => {
-    var element = document.getElementById("drag");
+const resetZoom = () => {
+    zoomLevel = 1;
+    canvas.setZoom(zoomLevel)
+}
 
+
+const drag = () => {
     if (isDraging) {
         element.classList.remove("active")
         isDraging = false;
@@ -62,11 +78,55 @@ document.getElementById('drag').addEventListener('click', () => {
             }
         })
     }
-})
+}
+
+const resetCanvasPosition = () => {
+    canvas.absolutePan(new fabric.Point(initialCanvasPosition.left, initialCanvasPosition.top));
+    resetZoom()
+};
+
+
+const clearCanvas = (canvas, state) => {
+    canvas.off('mouse:move')
+    element.classList.remove("active")
+
+     const currentBg = canvas.backgroundImage
+     console.log(currentBg)
+
+    // Restablece el zoom
+    zoomLevel = 1
+    canvas.setZoom(zoomLevel)
+    
+    resetCanvasPosition()
+
+    state.val = canvas.toSVG();
+    // Elimina el rectángulo blanco que agrega automaticamente del SVG
+    state.val = state.val.replace('<rect x="0" y="0" width="100%" height="100%" fill="white"></rect>', '');
+    console.log(state.val);
+    canvas.getObjects().forEach((o) => {
+        if (o !== canvas.backgroundImage) {
+            canvas.remove(o);
+        }
+    });
+};
+
+
+const restoreCanvas = (canvas, state, bgUrl) => {
+    if (state.val) {
+        fabric.loadSVGFromString(state.val, objects => {
+            console.log(state.val)
+            console.log(objects)
+            objects = objects.filter(o => o['xlink:href'] !== bgUrl)
+            console.log(objects, "filtrados")
+            canvas.add(...objects)
+            canvas.requestRenderAll()
+        })
+    }
+}
 
 const createRect = (canvas) => {
     console.log("rec")
-    const canvCenter = canvas.getCenter();
+
     const rect = new fabric.Rect({
         width: 50,
         height: 50,
@@ -81,8 +141,7 @@ const createRect = (canvas) => {
 }
 
 const createCircle = (canvas) => {
-    console.log("rec")
-    const canvCenter = canvas.getCenter();
+    console.log("circ")
     const circle = new fabric.Circle({
         radius: 30,
         fill: "orange",
@@ -97,9 +156,9 @@ const createCircle = (canvas) => {
 
 
 const canvas = initCanvas('canvas')
-let mousePressed = false;
+const canvCenter = canvas.getCenter();
 
-setBackground('https://i.pinimg.com/736x/d6/17/80/d61780ee78a35d5f4a92233d128b71bf.jpg', canvas)
+setBackground(bgUrl, canvas)
 
 
 

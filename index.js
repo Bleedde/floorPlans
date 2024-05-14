@@ -12,8 +12,8 @@ let bgUrl = 'https://res.cloudinary.com/dvrjzie6x/image/upload/v1715712806/floor
 // reference canvas element (with id="canvas on the html")
 const initCanvas = (id) => {
     return new fabric.Canvas(id, {
-        width: 1350,
-        height: 900,
+        width: 1000,
+        height: 700,
         selection: false,
     });
 }
@@ -22,8 +22,8 @@ const initCanvas = (id) => {
 const setBackground = (url, canvas) => {
     fabric.Image.fromURL(url, (img) => {
         // Calcula el factor de escala para ajustar la imagen al tamaño del lienzo
-        // const scaleX = canvas.width / img.width;
-        // const scaleY = canvas.height / img.height;
+        const scaleX = canvas.width / img.width;
+        const scaleY = canvas.height / img.height;
         // Establece la imagen de fondo y aplica el escalado
         canvas.setBackgroundImage(
             img,
@@ -34,8 +34,8 @@ const setBackground = (url, canvas) => {
                 top: canvCenter.top,
                 left: canvCenter.left,
                 // usa las constantes declaradas anteriormente para escalar la imagen al tamaño del lienzo
-                // scaleX: scaleX,
-                // scaleY: scaleY
+                scaleX: scaleX,
+                scaleY: scaleY
             }
         );
     });
@@ -112,20 +112,76 @@ const createRect = (canvas) => {
     canvas.renderAll();
 }
 
-const createCircle = (canvas) => {
-    console.log("circ")
-    const circle = new fabric.Circle({
-        radius: 30,
-        fill: "orange",
+
+// Crea un círculo en Fabric.js
+const createCircle = (canvas, color) => {
+
+    // Crea el círculo exterior con borde azul y relleno blanco
+    const outerCircle = new fabric.Circle({
+        radius: 10, // Tamaño del radio del círculo exterior
+        fill: '', // Sin relleno
+        stroke: color, // Borde azul
+        strokeWidth: 3, // Ancho del borde exterior
+        originX: 'center',
+        originY: 'center'
+    });
+
+    // Crea el círculo interior con relleno azul
+    const innerCircle = new fabric.Circle({
+        radius: 6, // Tamaño del radio del círculo interior
+        fill: color,
+        originX: 'center',
+        originY: 'center'
+    });
+
+    // Crea un círculo adicional para el fondo blanco
+    const backgroundCircle = new fabric.Circle({
+        radius: 10, // Tamaño del radio igual al del círculo interior
+        fill: 'white', 
+        originX: 'center',
+        originY: 'center',
+    });
+
+    // Agrupa los tres círculos en un solo objeto de grupo
+    const circleGroup = new fabric.Group([outerCircle, backgroundCircle, innerCircle], {
         left: canvCenter.left,
         top: canvCenter.top,
         originX: 'center',
-        originY: 'center',
-    })
-    canvas.add(circle)
+        originY: 'center'
+    });
+
+    // Agrega el grupo al lienzo
+    canvas.add(circleGroup);
+
+    // Renderiza el lienzo
     canvas.renderAll();
 }
 
+const createPentagon = (canvas) => {
+    // Define las coordenadas de los puntos para el pentágono
+    const points = [
+        { x: 0, y: 35 },
+        { x: 100, y: 35 },
+        { x: 75, y: 100 },
+        { x: 25, y: 100 },
+        { x: 0, y: 35 }
+    ];
+
+    // Crea el pentágono utilizando un polígono personalizado en Fabric.js
+    const pentagon = new fabric.Polygon(points, {
+        fill: 'white', 
+        stroke: 'blue', 
+        strokeWidth: 3, 
+        left: canvCenter.left,
+        top: canvCenter.top,
+        originX: 'center',
+        originY: 'center'
+    });
+
+    // Agrega el pentágono al lienzo
+    canvas.add(pentagon);
+    canvas.renderAll();
+}
 
 const canvas = initCanvas('canvas')
 const canvCenter = canvas.getCenter();
@@ -144,7 +200,7 @@ canvas.on('mouse:wheel', function (opt) {
 });
 
 
-canvas.on('mouse:down', function(event) {
+canvas.on('mouse:down', function (event) {
     // Verifica si la tecla Ctrl está presionada
     if (event.e.ctrlKey) {
         // Activa el arrastre del lienzo
@@ -155,8 +211,8 @@ canvas.on('mouse:down', function(event) {
         var startY = event.e.clientY;
 
         // Event listener para el evento mousemove en el lienzo
-        canvas.on('mouse:move', function(event) {
-            
+        canvas.on('mouse:move', function (event) {
+
             // Verifica si se está arrastrando el lienzo
             if (canvas.isDragging) {
                 // Cambia el cursor
@@ -175,7 +231,7 @@ canvas.on('mouse:down', function(event) {
         });
 
         // Event listener para el evento mouseup en el lienzo
-        canvas.on('mouse:up', function() {
+        canvas.on('mouse:up', function () {
             // Desactiva el arrastre del lienzo
             canvas.isDragging = false;
 

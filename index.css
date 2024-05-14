@@ -13,10 +13,26 @@ h1{
     color: black;
 }
 
-
-canvas{
-    border: 1px solid transparent;
+/* .circle {
+    width: 20px;
+    height: 20px;
+    position: relative;
+    background-color: white;
+    border: 2px solid #1796FF;
+    border-radius: 50%;
 }
+
+.circle::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px; 
+    height: 12px; 
+    background-color: #1796FF;
+    border-radius: 50%;
+} */
 
 .toolkit{
     display: flex;

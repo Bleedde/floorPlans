@@ -6,17 +6,17 @@ let initialCanvasPosition = { left: 0, top: 0 };
 
 const svgState = {}
 
-let bgUrl = 'https://i.pinimg.com/736x/d6/17/80/d61780ee78a35d5f4a92233d128b71bf.jpg'
+let bgUrl = 'floorPlan.png'
 // https://i.pinimg.com/736x/d6/17/80/d61780ee78a35d5f4a92233d128b71bf.jpg
 
 // reference canvas element (with id="canvas on the html")
 const initCanvas = (id) => {
     return new fabric.Canvas(id, {
-        width: 800,
-        height: 520,
+        width: 1350,
+        height: 900,
         selection: false,
     });
- }
+}
 
 
 const setBackground = (url, canvas) => {
@@ -54,55 +54,27 @@ const zoomOut = () => {
     }
 }
 
-const resetZoom = () => {
-    zoomLevel = 1;
-    canvas.setZoom(zoomLevel)
-}
-
-
-const drag = () => {
-    if (isDraging) {
-        element.classList.remove("active")
-        isDraging = false;
-        canvas.off('mouse:move'); // Detener el evento de arrastre
-    } else {
-        element.classList.add("active")
-        canvas.on('mouse:move', (event) => {
-            isDraging = true;
-            // console.log(event.e.movementX)
-            if (mousePressed) {
-                canvas.setCursor('grab')
-                const mEvent = event.e
-                const delta = new fabric.Point(mEvent.movementX, mEvent.movementY)
-                canvas.relativePan(delta)
-            }
-        })
-    }
-}
-
 const resetCanvasPosition = () => {
     canvas.absolutePan(new fabric.Point(initialCanvasPosition.left, initialCanvasPosition.top));
-    resetZoom()
+    canvas.setZoom(1)
 };
 
 
 const clearCanvas = (canvas, state) => {
     canvas.off('mouse:move')
-    element.classList.remove("active")
 
-     const currentBg = canvas.backgroundImage
-     console.log(currentBg)
+    const currentBg = canvas.backgroundImage
+    console.log(currentBg, "current backgroundd")
 
     // Restablece el zoom
     zoomLevel = 1
     canvas.setZoom(zoomLevel)
-    
+
     resetCanvasPosition()
 
     state.val = canvas.toSVG();
     // Elimina el rectángulo blanco que agrega automaticamente del SVG
     state.val = state.val.replace('<rect x="0" y="0" width="100%" height="100%" fill="white"></rect>', '');
-    console.log(state.val);
     canvas.getObjects().forEach((o) => {
         if (o !== canvas.backgroundImage) {
             canvas.remove(o);
@@ -160,12 +132,88 @@ const canvCenter = canvas.getCenter();
 
 setBackground(bgUrl, canvas)
 
+canvas.on('mouse:wheel', function (opt) {
+    var delta = opt.e.deltaY;
+    var zoom = canvas.getZoom();
+    zoom *= 0.999 ** delta;
+    if (zoom > 20) zoom = 20;
+    if (zoom < 0.01) zoom = 0.01;
+    canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+    opt.e.preventDefault();
+    opt.e.stopPropagation();
+});
 
 
-canvas.on('mouse:down', (event) => {
-    mousePressed = true
-})
+canvas.on('mouse:down', function(event) {
+    // Verifica si la tecla Ctrl está presionada
+    if (event.e.ctrlKey) {
+        // Activa el arrastre del lienzo
+        canvas.isDragging = true;
 
-canvas.on('mouse:up', (event) => {
-    mousePressed = false
-})
+        // Obtiene la posición inicial del mouse
+        var startX = event.e.clientX;
+        var startY = event.e.clientY;
+
+        // Event listener para el evento mousemove en el lienzo
+        canvas.on('mouse:move', function(event) {
+            
+            // Verifica si se está arrastrando el lienzo
+            if (canvas.isDragging) {
+                // Cambia el cursor
+                canvas.setCursor('grab')
+                // Calcula la diferencia en la posición del mouse
+                var deltaX = event.e.clientX - startX;
+                var deltaY = event.e.clientY - startY;
+
+                // Mueve el lienzo según la diferencia
+                canvas.relativePan(new fabric.Point(deltaX, deltaY));
+
+                // Actualiza la posición inicial del mouse
+                startX = event.e.clientX;
+                startY = event.e.clientY;
+            }
+        });
+
+        // Event listener para el evento mouseup en el lienzo
+        canvas.on('mouse:up', function() {
+            // Desactiva el arrastre del lienzo
+            canvas.isDragging = false;
+
+            // Remueve los event listeners de mousemove y mouseup
+            canvas.off('mouse:move');
+            canvas.off('mouse:up');
+        });
+    }
+});
+
+
+// canvas.on('mouse:down', (event) => {
+//     mousePressed = true
+// })
+
+// canvas.on('mouse:up', (event) => {
+//     mousePressed = false
+// })
+
+// const drag = () => {
+//     if (isDraging) {
+//         element.classList.remove("active")
+//         isDraging = false;
+//         canvas.off('mouse:move'); // Detener el evento de arrastre
+//     } else {
+//         element.classList.add("active")
+//         canvas.on('mouse:move', (event) => {
+//             isDraging = true;
+//             // console.log(event.e.movementX)
+//             if (mousePressed) {
+//                 canvas.setCursor('grab')
+//                 const mEvent = event.e
+//                 const delta = new fabric.Point(mEvent.movementX, mEvent.movementY)
+//                 canvas.relativePan(delta)
+//             }
+//         })
+//     }
+// }
+
+
+

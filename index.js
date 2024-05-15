@@ -3,6 +3,7 @@ let isDraging = false;
 let mousePressed = false;
 var element = document.getElementById("drag");
 let initialCanvasPosition = { left: 0, top: 0 };
+let currentId = 0;
 
 const svgState = {}
 
@@ -16,6 +17,8 @@ const initCanvas = (id) => {
         height: 700,
         selection: false,
     });
+
+
 }
 
 
@@ -97,8 +100,7 @@ const restoreCanvas = (canvas, state, bgUrl) => {
 }
 
 const createRect = (canvas) => {
-    console.log("rec")
-
+    const id = generateUniqueId();
     const rect = new fabric.Rect({
         width: 50,
         height: 50,
@@ -108,54 +110,138 @@ const createRect = (canvas) => {
         originX: 'center',
         originY: 'center',
     })
+
+    rect.id = id
     canvas.add(rect)
+
+    rect.on('mousedown', function (options) {
+        console.log('Círculo con id:', id);
+    });
+
     canvas.renderAll();
 }
 
+function generateUniqueId() {
+    return currentId++;
+}
 
 // Crea un círculo en Fabric.js
-const createCircle = (canvas, color) => {
+const createCircle = (canvas, type, color = '#1796FF', top, left) => {
+    // Crea un ID único para el círculo
+    const id = generateUniqueId();
 
-    // Crea el círculo exterior con borde azul y relleno blanco
-    const outerCircle = new fabric.Circle({
-        radius: 10, // Tamaño del radio del círculo exterior
-        fill: '', // Sin relleno
-        stroke: color, // Borde azul
-        strokeWidth: 3, // Ancho del borde exterior
-        originX: 'center',
-        originY: 'center'
-    });
+    let circle; // Define la variable circle fuera del bloque if
 
-    // Crea el círculo interior con relleno azul
-    const innerCircle = new fabric.Circle({
-        radius: 6, // Tamaño del radio del círculo interior
-        fill: color,
-        originX: 'center',
-        originY: 'center'
-    });
+    if (type === "available") {
+        circle = new fabric.Circle({
+            radius: 10, // Tamaño del radio del círculo
+            fill: 'white', // Relleno blanco
+            stroke: color, // Borde azul
+            strokeWidth: 2, // Ancho del borde
+            left: left,
+            top: top,
+            originX: 'center',
+            originY: 'center'
+        });
 
-    // Crea un círculo adicional para el fondo blanco
-    const backgroundCircle = new fabric.Circle({
-        radius: 10, // Tamaño del radio igual al del círculo interior
-        fill: 'white', 
-        originX: 'center',
-        originY: 'center',
-    });
+        circle.id = id;
 
-    // Agrupa los tres círculos en un solo objeto de grupo
-    const circleGroup = new fabric.Group([outerCircle, backgroundCircle, innerCircle], {
-        left: canvCenter.left,
-        top: canvCenter.top,
-        originX: 'center',
-        originY: 'center'
-    });
+        circle.on('mousedown', function (options) {
+            console.log('available con id:', id);
+        });
+        // Agrega el circulo al grupo 
+        canvas.add(circle)
+        // Renderiza el lienzo
+        canvas.renderAll();
+    }
 
-    // Agrega el grupo al lienzo
-    canvas.add(circleGroup);
+    else if (type === "occupied") {
+        const outerCircle = new fabric.Circle({
+            radius: 10,
+            fill: 'white',
+            stroke: '#1796FF',
+            strokeWidth: 2,
+            originX: 'center',
+            originY: 'center'
+        });
 
-    // Renderiza el lienzo
-    canvas.renderAll();
+        const innerCircle = new fabric.Circle({
+            radius: 5.5,
+            fill: color,
+            originX: 'center',
+            originY: 'center'
+        });
+
+        const circleGroup = new fabric.Group([outerCircle, innerCircle], {
+            left: left,
+            top: top,
+            originX: 'center',
+            originY: 'center',
+            selectable: true
+        });
+
+        circleGroup.id = id;
+
+        circleGroup.on('mousedown', function (options) {
+            console.log('occupied con id:', id);
+            // Aquí puedes agregar la lógica que desees ejecutar cuando se haga clic en el triángulo
+        });
+        // Agrega el grupo de circulos al lienzo
+        canvas.add(circleGroup)
+        // Renderiza el lienzo
+        canvas.renderAll();
+    }
+
+    else if (type === "offline") {
+        // Crea el círculo exterior con borde rojo y sin relleno
+        const outerCircle = new fabric.Circle({
+            radius: 10,
+            fill: 'white', // Sin relleno
+            stroke: '#FF6262', // Borde rojo
+            strokeWidth: 2,
+            left: left,
+            top: top,
+            originX: 'center',
+            originY: 'center'
+        });
+
+        // Crea un círculo blanco para simular el fondo detrás del rectángulo
+
+
+        // Crea un rectángulo en la mitad del círculo con fondo blanco
+        const rectangle = new fabric.Rect({
+            width: 12,
+            height: 2,
+            fill: '#FF6262', // Color del rectángulo
+            left: left,
+            top: top,
+            originX: 'center',
+            originY: 'center'
+        });
+
+        const group = new fabric.Group([outerCircle, rectangle], {
+            left: left,
+            top: top,
+            originX: 'center',
+            originY: 'center',
+            selectable: true
+        });
+
+        group.id = id;
+
+        group.on('mousedown', function (options) {
+            console.log('offline con id:', id);
+            // Aquí puedes agregar la lógica que desees ejecutar cuando se haga clic en el círculo offline
+        });
+
+        canvas.add(group);
+        // Renderiza el lienzo
+        canvas.renderAll();
+    }
+
 }
+
+
 
 const createPentagon = (canvas) => {
     // Define las coordenadas de los puntos para el pentágono
@@ -169,9 +255,9 @@ const createPentagon = (canvas) => {
 
     // Crea el pentágono utilizando un polígono personalizado en Fabric.js
     const pentagon = new fabric.Polygon(points, {
-        fill: 'white', 
-        stroke: 'blue', 
-        strokeWidth: 3, 
+        fill: 'white',
+        stroke: 'blue',
+        strokeWidth: 3,
         left: canvCenter.left,
         top: canvCenter.top,
         originX: 'center',
@@ -188,6 +274,48 @@ const canvCenter = canvas.getCenter();
 
 setBackground(bgUrl, canvas)
 
+
+// Creacion de los puntos!
+createCircle(canvas, 'occupied', undefined, 70, 165);
+createCircle(canvas, 'occupied', undefined, 70, 298);
+createCircle(canvas, 'occupied', undefined, 70, 234);
+createCircle(canvas, 'available', undefined, 70, 203);
+createCircle(canvas, 'available', undefined, 70, 265);
+createCircle(canvas, 'available', undefined, 70, 329);
+
+createCircle(canvas, 'available', undefined, 99, 165);
+createCircle(canvas, 'available', undefined, 99, 234);
+createCircle(canvas, 'available', undefined, 99, 298);
+createCircle(canvas, 'available', undefined, 99, 203);
+createCircle(canvas, 'available', undefined, 99, 265);
+createCircle(canvas, 'available', undefined, 99, 329);
+
+createCircle(canvas, 'available', undefined, 128, 165);
+createCircle(canvas, 'available', undefined, 128, 234);
+createCircle(canvas, 'available', undefined, 128, 298);
+createCircle(canvas, 'available', undefined, 128, 203);
+createCircle(canvas, 'available', undefined, 128, 265);
+createCircle(canvas, 'available', undefined, 128, 329);
+
+createCircle(canvas, 'offline', undefined, 158, 714);
+createCircle(canvas, 'offline', undefined, 158, 674);
+createCircle(canvas, 'offline', undefined, 186, 674);
+createCircle(canvas, 'available', undefined, 186, 714);
+createCircle(canvas, 'offline', undefined, 214, 674);
+createCircle(canvas, 'available', undefined, 214, 714);
+createCircle(canvas, 'available', undefined, 240, 674);
+createCircle(canvas, 'available', undefined, 240, 714);
+
+createCircle(canvas, 'available', undefined, 158, 743);
+createCircle(canvas, 'available', undefined, 186, 743);
+createCircle(canvas, 'available', undefined, 214, 743);
+createCircle(canvas, 'available', undefined, 240, 743);
+createCircle(canvas, 'occupied', undefined, 158, 780);
+createCircle(canvas, 'occupied', '#96EC6D', 186, 780);
+createCircle(canvas, 'occupied', '#96EC6D', 214, 780);
+createCircle(canvas, 'available', undefined, 240, 780);
+
+
 canvas.on('mouse:wheel', function (opt) {
     var delta = opt.e.deltaY;
     var zoom = canvas.getZoom();
@@ -201,6 +329,7 @@ canvas.on('mouse:wheel', function (opt) {
 
 
 canvas.on('mouse:down', function (event) {
+    // console.log(event.e)
     // Verifica si la tecla Command (Meta) está presionada en Mac
     if (event.e.metaKey || event.e.ctrlKey) {
         // Activa el arrastre del lienzo
@@ -240,6 +369,18 @@ canvas.on('mouse:down', function (event) {
             canvas.off('mouse:up');
         });
     }
+});
+
+// Obtén todos los objetos presentes en el lienzo
+const objects = canvas.getObjects();
+
+// Recorre cada objeto y hace un console.log de sus propiedades
+objects.forEach((obj) => {
+    console.log('Tipo:', obj.type); // Tipo de objeto (círculo, rectángulo, etc.)
+    console.log('ID:', obj.id); // ID del objeto, si se asignó anteriormente
+    console.log('Posición (left, top):', obj.left, obj.top); // Posición izquierda y superior del objeto
+    console.log('Dimensiones (width, height):', obj.width, obj.height); // Dimensiones del objeto (si tiene)
+    console.log('-------');
 });
 
 

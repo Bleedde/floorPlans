@@ -6,7 +6,7 @@ let initialCanvasPosition = { left: 0, top: 0 };
 
 const svgState = {}
 
-let bgUrl = 'https://res.cloudinary.com/dvrjzie6x/image/upload/v1715712806/floorPlan_j5t0av.png'
+let bgUrl = 'https://res.cloudinary.com/dvrjzie6x/image/upload/v1715782256/floorPlan_tujpgr.png'
 // https://i.pinimg.com/736x/d6/17/80/d61780ee78a35d5f4a92233d128b71bf.jpg
 
 // reference canvas element (with id="canvas on the html")

@@ -201,8 +201,8 @@ canvas.on('mouse:wheel', function (opt) {
 
 
 canvas.on('mouse:down', function (event) {
-    // Verifica si la tecla Ctrl está presionada
-    if (event.e.ctrlKey) {
+    // Verifica si la tecla Command (Meta) está presionada en Mac
+    if (event.e.metaKey || event.e.ctrlKey) {
         // Activa el arrastre del lienzo
         canvas.isDragging = true;
 
@@ -212,11 +212,11 @@ canvas.on('mouse:down', function (event) {
 
         // Event listener para el evento mousemove en el lienzo
         canvas.on('mouse:move', function (event) {
-
             // Verifica si se está arrastrando el lienzo
             if (canvas.isDragging) {
                 // Cambia el cursor
-                canvas.setCursor('grab')
+                canvas.setCursor('grab');
+
                 // Calcula la diferencia en la posición del mouse
                 var deltaX = event.e.clientX - startX;
                 var deltaY = event.e.clientY - startY;
@@ -241,6 +241,7 @@ canvas.on('mouse:down', function (event) {
         });
     }
 });
+
 
 
 // canvas.on('mouse:down', (event) => {

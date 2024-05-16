@@ -4,6 +4,7 @@ let mousePressed = false;
 var element = document.getElementById("drag");
 let initialCanvasPosition = { left: 0, top: 0 };
 let currentId = 0;
+let opacity = 1;
 
 
 const svgState = {}
@@ -38,10 +39,17 @@ const setBackground = (url, canvas) => {
                 left: canvCenter.left,
                 // usa las constantes declaradas anteriormente para escalar la imagen al tamaño del lienzo
                 scaleX: scaleX,
-                scaleY: scaleY,
+                scaleY: scaleY
             }
         );
     });
+}
+
+const setBackgroundOpacity = (canvas, opacity) => {
+    if (canvas.backgroundImage) {
+        canvas.backgroundImage.opacity = opacity;
+        canvas.renderAll(); 
+    }
 }
 
 
@@ -154,7 +162,7 @@ const createCircle = (canvas, type, color = '#1796FF', top, left, selectable = f
             originX: 'center',
             originY: 'center',
             selectable: selectable,
-            hoverCursor: 'default'
+            hoverCursor: 'default',
         });
 
         circle.id = id;
@@ -204,7 +212,7 @@ const createCircle = (canvas, type, color = '#1796FF', top, left, selectable = f
             originX: 'center',
             originY: 'center',
             selectable: selectable,
-            hoverCursor: 'pointer'
+            hoverCursor: 'default'
         });
 
         circleGroup.id = id;
@@ -264,7 +272,7 @@ const createCircle = (canvas, type, color = '#1796FF', top, left, selectable = f
             originX: 'center',
             originY: 'center',
             selectable: selectable,
-            hoverCursor: 'pointer'
+            hoverCursor: 'default'
         });
 
         group.id = id;
@@ -397,7 +405,8 @@ function createGroup(canvas, top, left, type, fillColor = '#1796FF') {
             fontWeight: 'bold',
             fill: 'black',
             originX: 'center',
-            originY: 'center'
+            originY: 'center',
+            fontFamily: 'Arial',
         });
 
         // Crea el fondo del texto (rectángulo redondeado)
@@ -447,6 +456,28 @@ function createGroup(canvas, top, left, type, fillColor = '#1796FF') {
         canvas.add(group); // Agrega el fondo del texto al lienzo
         canvas.renderAll(); // Renderiza el lienzo
     });
+}
+
+const hideAllObjects = (canvas, hide) => {
+    const objects = canvas.getObjects()
+
+    if(hide === true){
+        objects.forEach((obj) => {
+            obj.visible = false; 
+            
+        });
+        canvas.renderAll(); 
+    }else{
+        objects.forEach((obj) => {
+            if(obj.id){
+                obj.visible = true; 
+            }
+            else{
+                obj.visible = false
+            }
+        });
+        canvas.renderAll(); 
+    }
 }
 
 
@@ -531,8 +562,8 @@ canvas.on('mouse:wheel', function (opt) {
     var delta = opt.e.deltaY;
     var zoom = canvas.getZoom();
     zoom *= 0.999 ** delta;
-    if (zoom > 20) zoom = 20;
-    if (zoom < 0.01) zoom = 0.01;
+    if (zoom > 2) zoom = 2;
+    if (zoom < 0.8) zoom = 0.8;
     canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
     opt.e.preventDefault();
     opt.e.stopPropagation();
@@ -588,6 +619,7 @@ const objects = canvas.getObjects();
 // Recorre cada objeto y hace un console.log de sus propiedades
 objects.forEach((obj) => {
     if (obj.id) {
+        console.log(obj)
         console.log('Tipo:', obj.type); // Tipo de objeto (círculo, rectángulo, etc.)
         console.log('ID:', obj.id); // ID del objeto, si se asignó anteriormente
         console.log('Posición (left, top):', obj.left, obj.top); // Posición izquierda y superior del objeto

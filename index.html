@@ -13,8 +13,12 @@
     <div class="toolkit">
         <button onclick="createRect(canvas)">Square</button>
         <button onclick="createCircle(canvas, 'available', undefined, canvCenter.top, canvCenter.left, true)" class="circle">Circle</button>
-        <button onclick="clearCanvas(canvas, svgState)">Clear</button>
-        <button onclick="restoreCanvas(canvas, svgState, bgUrl)">Restore</button>
+        <button onclick="hideAllObjects(canvas, true)">Ocultar</button>
+        <button onclick="hideAllObjects(canvas, false)">Mostrar</button>
+        <!-- <button onclick="clearCanvas(canvas, svgState)">Clear</button>
+        <button onclick="restoreCanvas(canvas, svgState, bgUrl)">Restore</button> -->
+        <button onclick="setBackgroundOpacity(canvas, 1)">Opacity Normal</button>
+        <button onclick="setBackgroundOpacity(canvas, 0.5)">Opacity 50%</button>
         <button onclick="resetCanvasPosition()">Reset position</button>
     </div>
 

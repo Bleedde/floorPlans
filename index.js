@@ -5,6 +5,7 @@ var element = document.getElementById("drag");
 let initialCanvasPosition = { left: 0, top: 0 };
 let currentId = 0;
 
+
 const svgState = {}
 
 let bgUrl = 'https://res.cloudinary.com/dvrjzie6x/image/upload/v1715782256/floorPlan_tujpgr.png'
@@ -126,7 +127,7 @@ function generateUniqueId() {
 }
 
 // Crea un círculo en Fabric.js
-const createCircle = (canvas, type, color = '#1796FF', top, left) => {
+const createCircle = (canvas, type, color = '#1796FF', top, left, selectable = false) => {
     // Crea un ID único para el círculo
     const id = generateUniqueId();
 
@@ -141,7 +142,8 @@ const createCircle = (canvas, type, color = '#1796FF', top, left) => {
             left: left,
             top: top,
             originX: 'center',
-            originY: 'center'
+            originY: 'center',
+            selectable: selectable
         });
 
         circle.id = id;
@@ -177,14 +179,13 @@ const createCircle = (canvas, type, color = '#1796FF', top, left) => {
             top: top,
             originX: 'center',
             originY: 'center',
-            selectable: true
+            selectable: selectable
         });
 
         circleGroup.id = id;
 
         circleGroup.on('mousedown', function (options) {
             console.log('occupied con id:', id);
-            // Aquí puedes agregar la lógica que desees ejecutar cuando se haga clic en el triángulo
         });
         // Agrega el grupo de circulos al lienzo
         canvas.add(circleGroup)
@@ -224,50 +225,103 @@ const createCircle = (canvas, type, color = '#1796FF', top, left) => {
             top: top,
             originX: 'center',
             originY: 'center',
-            selectable: true
+            selectable: selectable
         });
 
         group.id = id;
 
         group.on('mousedown', function (options) {
             console.log('offline con id:', id);
-            // Aquí puedes agregar la lógica que desees ejecutar cuando se haga clic en el círculo offline
         });
 
-        canvas.add(group);
-        // Renderiza el lienzo
-        canvas.renderAll();
+        canvas.add(group).renderAll();
+    }
+}
+
+function crearSVGEnFabric(canvas, top, left, type, fillColor = '#1796FF') {
+
+    let svgCode;
+
+    if (type === 'available') {
+        svgCode = `<svg xmlns="http://www.w3.org/2000/svg" width="35" height="33" viewBox="0 0 35 33" fill="none">
+<circle cx="17.4471" cy="16.4437" r="10.7932" fill="white"/>
+<path d="M30.5781 12.4006L27.468 7.00986H22.8928L20.5568 2.9668H14.3367L12.0007 7.00986H7.42552L4.31548 12.4006L6.65147 16.4437L4.31548 20.4867L7.42552 25.8775H12.0007L14.3367 29.9205H20.5568L22.8928 25.8775H27.468L30.5781 20.4867L28.2421 16.4437L30.5781 12.4006ZM27.4128 12.4006L25.8646 15.096H22.9066L21.3585 12.4006L22.9066 9.70523H25.8646L27.4128 12.4006ZM15.9816 19.139L14.4335 16.4437L15.9816 13.7483H18.912L20.4601 16.4437L18.912 19.139H15.9816ZM18.9396 5.66217L20.4877 8.33059L18.912 11.0529H15.9816L14.4058 8.33059L15.954 5.66217H18.9396ZM9.04275 9.70523H12.0007L13.5489 12.4006L12.0007 15.096H9.04275L7.48081 12.4006L9.04275 9.70523ZM7.48081 20.4867L9.02892 17.7914H11.9869L13.535 20.4867L11.9869 23.1821H9.04275L7.48081 20.4867ZM15.954 27.2252L14.4058 24.5567L15.9816 21.8344H18.912L20.4739 24.5567L18.9396 27.2252H15.954ZM25.8508 23.1821H22.8928L21.3447 20.4867L22.8928 17.7914H25.8508L27.3989 20.4867L25.8508 23.1821Z" fill="${fillColor}"/>
+</svg>`
+    } else {
+        svgCode = `<svg xmlns="http://www.w3.org/2000/svg" width="33" height="32" viewBox="0 0 33 32" fill="none" style="&#10;    background-color: black;&#10;">
+<circle cx="16.2187" cy="16.0921" r="10.4677" fill="white"/>
+<circle cx="15.9095" cy="16.0922" r="7.17654" fill="${fillColor}"/>
+<path d="M28.7816 12.2241L25.8061 7.06668H21.4289L19.194 3.19861H13.2432L11.0083 7.06668H6.63108L3.65564 12.2241L5.89053 16.0922L3.65564 19.9603L6.63108 25.1177H11.0083L13.2432 28.9858H19.194L21.4289 25.1177H25.8061L28.7816 19.9603L26.5467 16.0922L28.7816 12.2241ZM25.7532 12.2241L24.2721 14.8028H21.4422L19.9611 12.2241L21.4422 9.6454H24.2721L25.7532 12.2241ZM14.8168 18.6709L13.3357 16.0922L14.8168 13.5135H17.6204L19.1015 16.0922L17.6204 18.6709H14.8168ZM17.6468 5.77732L19.1279 8.33025L17.6204 10.9348H14.8168L13.3093 8.33025L14.7904 5.77732H17.6468ZM8.17831 9.6454H11.0083L12.4894 12.2241L11.0083 14.8028H8.17831L6.68398 12.2241L8.17831 9.6454ZM6.68398 19.9603L8.16508 17.3815H10.9951L12.4762 19.9603L10.9951 22.539H8.17831L6.68398 19.9603ZM14.7904 26.407L13.3093 23.8541L14.8168 21.2496H17.6204L19.1147 23.8541L17.6468 26.407H14.7904ZM24.2589 22.539H21.4289L19.9478 19.9603L21.4289 17.3815H24.2589L25.74 19.9603L24.2589 22.539Z" fill="${fillColor}"/>
+</svg>
+`
     }
 
-}
+    fabric.loadSVGFromString(svgCode, function (objects, options) {
+        const obj = fabric.util.groupSVGElements(objects, options);
+        obj.set({ left: left, top: top, originX: 'center', originY: 'center' });
 
+        // Crea el texto encima del objeto SVG
+        const text = new fabric.Text('0/4', {
+            left: left,
+            top: top - 20,
+            fontSize: 10,
+            fontWeight: 'bold',
+            fill: 'black',
+            originX: 'center',
+            originY: 'center'
+        });
 
+        // Crea el fondo del texto (rectángulo redondeado)
+        const textBackground = new fabric.Rect({
+            width: text.width + 5,
+            height: text.height,
+            fill: 'white', // Color del fondo del texto
+            rx: 5, // Radio de la esquina redondeada en x
+            ry: 5, // Radio de la esquina redondeada en y
+            originX: 'center',
+            originY: 'center',
+            top: top - 20,
+            left: left
+        });
 
-const createPentagon = (canvas) => {
-    // Define las coordenadas de los puntos para el pentágono
-    const points = [
-        { x: 0, y: 35 },
-        { x: 100, y: 35 },
-        { x: 75, y: 100 },
-        { x: 25, y: 100 },
-        { x: 0, y: 35 }
-    ];
+        const group = new fabric.Group([obj, textBackground, text], {
+            left: left,
+            top: top, // Posición ajustada para colocar el texto encima del SVG
+            originX: 'center',
+            originY: 'center',
+            selectable: false
+        });
 
-    // Crea el pentágono utilizando un polígono personalizado en Fabric.js
-    const pentagon = new fabric.Polygon(points, {
-        fill: 'white',
-        stroke: 'blue',
-        strokeWidth: 3,
-        left: canvCenter.left,
-        top: canvCenter.top,
-        originX: 'center',
-        originY: 'center'
+        canvas.add(group); // Agrega el fondo del texto al lienzo
+        canvas.renderAll(); // Renderiza el lienzo
     });
-
-    // Agrega el pentágono al lienzo
-    canvas.add(pentagon);
-    canvas.renderAll();
 }
+
+function createHub(canvas, top, left) {
+    let svgCode = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="33" viewBox="0 0 25 33" fill="none" style="&#10;    background-color: black;&#10;">
+    <g id="Group 671">
+    <g id="Group 601">
+    <path id="Polygon 1" d="M12.7391 32.9265L3.76445 20.5949L21.8064 20.5949L12.7391 32.9265Z" fill="#B748FB"/>
+    <circle id="Ellipse 16" cx="12.7371" cy="12.843" r="11.8993" transform="rotate(-180 12.7371 12.843)" fill="#B748FB"/>
+    </g>
+    <circle id="Ellipse 17" cx="9.78859" cy="17.8193" r="1.79231" fill="white"/>
+    <circle id="Ellipse 18" cx="15.9706" cy="17.8193" r="1.79231" fill="white"/>
+    <circle id="Ellipse 19" cx="15.9709" cy="7.86687" r="1.79231" transform="rotate(180 15.9709 7.86687)" fill="white"/>
+    <circle id="Ellipse 20" cx="9.78893" cy="7.86687" r="1.79231" transform="rotate(180 9.78893 7.86687)" fill="white"/>
+    <circle id="Ellipse 21" cx="18.6656" cy="12.8432" r="1.79231" transform="rotate(-60 18.6656 12.8432)" fill="white"/>
+    <circle id="Ellipse 22" cx="6.90579" cy="12.843" r="1.79231" transform="rotate(120 6.90579 12.843)" fill="white"/>
+    </g>
+    </svg>`
+
+    fabric.loadSVGFromString(svgCode, function (objects, options) {
+        const obj = fabric.util.groupSVGElements(objects, options);
+        obj.set({ left: left, top: top, originX: 'center', originY: 'center', selectable: false });
+
+        canvas.add(obj);
+        canvas.renderAll(); // Renderiza el lienzo
+    });
+}
+
 
 const canvas = initCanvas('canvas')
 const canvCenter = canvas.getCenter();
@@ -276,12 +330,40 @@ setBackground(bgUrl, canvas)
 
 
 // Creacion de los puntos!
+createHub(canvas, 85, 650)
+createHub(canvas, 627, 269)
+
+crearSVGEnFabric(canvas, 74, 105, 'available');
+crearSVGEnFabric(canvas, 108, 80, 'available');
+
+crearSVGEnFabric(canvas, 180, 105, 'available');
+crearSVGEnFabric(canvas, 220, 105, 'available');
+crearSVGEnFabric(canvas, 198, 318, 'occupied', '#42CD00');
+crearSVGEnFabric(canvas, 208, 504, 'occupied', '#42CD00');
+crearSVGEnFabric(canvas, 90, 619, 'available', '#FF6262');
+crearSVGEnFabric(canvas, 102, 699, 'available', '#FF6262');
+
+crearSVGEnFabric(canvas, 255, 58, 'occupied');
+crearSVGEnFabric(canvas, 345, 90, 'available');
+crearSVGEnFabric(canvas, 420, 86, 'available');
+crearSVGEnFabric(canvas, 420, 163, 'available');
+crearSVGEnFabric(canvas, 380, 163, 'occupied');
+crearSVGEnFabric(canvas, 407, 220, 'available');
+crearSVGEnFabric(canvas, 327, 174, 'occupied');
+crearSVGEnFabric(canvas, 327, 228, 'occupied');
+
 createCircle(canvas, 'occupied', undefined, 70, 165);
 createCircle(canvas, 'occupied', undefined, 70, 298);
 createCircle(canvas, 'occupied', undefined, 70, 234);
 createCircle(canvas, 'available', undefined, 70, 203);
 createCircle(canvas, 'available', undefined, 70, 265);
 createCircle(canvas, 'available', undefined, 70, 329);
+
+createCircle(canvas, 'available', undefined, 180, 160);
+createCircle(canvas, 'available', undefined, 230, 160);
+createCircle(canvas, 'available', undefined, 180, 195);
+createCircle(canvas, 'available', undefined, 207, 195);
+createCircle(canvas, 'available', undefined, 233, 195);
 
 createCircle(canvas, 'available', undefined, 99, 165);
 createCircle(canvas, 'available', undefined, 99, 234);

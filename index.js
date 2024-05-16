@@ -212,10 +212,12 @@ const createCircle = (canvas, type, color = '#1796FF', top, left, selectable = f
             originX: 'center',
             originY: 'center',
             selectable: selectable,
-            hoverCursor: 'default'
+            hoverCursor: 'default',
         });
 
         circleGroup.id = id;
+
+        canvas.add(circleGroup, tooltip);
 
         circleGroup.on('mouseover', function (options) {
             tooltip.set({
@@ -236,10 +238,6 @@ const createCircle = (canvas, type, color = '#1796FF', top, left, selectable = f
             console.log('occupied con id:', id);
         });
 
-        // Agrega el grupo de circulos al lienzo
-        canvas.add(circleGroup)
-        // Renderiza el lienzo
-        canvas.renderAll();
     }
 
     else if (type === "offline") {
@@ -277,6 +275,8 @@ const createCircle = (canvas, type, color = '#1796FF', top, left, selectable = f
 
         group.id = id;
 
+        canvas.add(group, tooltip)
+
         group.on('mouseover', function (options) {
             tooltip.set({
                 left: left, 
@@ -296,7 +296,6 @@ const createCircle = (canvas, type, color = '#1796FF', top, left, selectable = f
             console.log('offline con id:', id);
         });
 
-        canvas.add(group).renderAll();
     }
 }
 
@@ -335,6 +334,8 @@ function createHub(canvas, top, left) {
 
         obj.id = id;
 
+        canvas.add(obj, tooltip);
+
         obj.on('mouseover', function (options) {
             tooltip.set({
                 left: left, 
@@ -354,7 +355,7 @@ function createHub(canvas, top, left) {
             console.log('hub con id:', id);
         });
 
-        canvas.add(obj);
+      
         canvas.renderAll(); // Renderiza el lienzo
     });
 }
@@ -434,6 +435,8 @@ function createGroup(canvas, top, left, type, fillColor = '#1796FF') {
 
         group.id = id;
 
+        canvas.add(group, tooltip); 
+
         group.on('mouseover', function (options) {
             tooltip.set({
                 left: left, 
@@ -453,8 +456,7 @@ function createGroup(canvas, top, left, type, fillColor = '#1796FF') {
             console.log('group con id:', id);
         });
 
-        canvas.add(group); // Agrega el fondo del texto al lienzo
-        canvas.renderAll(); // Renderiza el lienzo
+        canvas.renderAll(); 
     });
 }
 
@@ -466,7 +468,7 @@ const hideAllObjects = (canvas, hide) => {
             obj.visible = false; 
             
         });
-        canvas.renderAll(); 
+        canvas.renderAll();
     }else{
         objects.forEach((obj) => {
             if(obj.id){
@@ -562,7 +564,7 @@ canvas.on('mouse:wheel', function (opt) {
     var delta = opt.e.deltaY;
     var zoom = canvas.getZoom();
     zoom *= 0.999 ** delta;
-    if (zoom > 2) zoom = 2;
+    if (zoom > 1.8) zoom = 1.8;
     if (zoom < 0.8) zoom = 0.8;
     canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
     opt.e.preventDefault();

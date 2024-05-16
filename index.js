@@ -22,7 +22,6 @@ const initCanvas = (id) => {
 
 }
 
-
 const setBackground = (url, canvas) => {
     fabric.Image.fromURL(url, (img) => {
         // Calcula el factor de escala para ajustar la imagen al tamaño del lienzo
@@ -39,7 +38,7 @@ const setBackground = (url, canvas) => {
                 left: canvCenter.left,
                 // usa las constantes declaradas anteriormente para escalar la imagen al tamaño del lienzo
                 scaleX: scaleX,
-                scaleY: scaleY
+                scaleY: scaleY,
             }
         );
     });
@@ -131,30 +130,55 @@ const createCircle = (canvas, type, color = '#1796FF', top, left, selectable = f
     // Crea un ID único para el círculo
     const id = generateUniqueId();
 
+    const tooltip = new fabric.Text(`${type} #${id}`, {
+        fontFamily: 'Arial',
+        fontSize: 15,
+        fill: 'black',
+        backgroundColor: 'yellow',
+        cornerSize: 25,
+        selectable: false,
+        visible: false,
+        hoverCursor: 'default'
+    });
+
     let circle; // Define la variable circle fuera del bloque if
 
     if (type === "available") {
         circle = new fabric.Circle({
-            radius: 10, // Tamaño del radio del círculo
-            fill: 'white', // Relleno blanco
-            stroke: color, // Borde azul
-            strokeWidth: 2, // Ancho del borde
+            radius: 10,
+            fill: 'white',
+            stroke: color,
+            strokeWidth: 2,
             left: left,
             top: top,
             originX: 'center',
             originY: 'center',
-            selectable: selectable
+            selectable: selectable,
+            hoverCursor: 'default'
         });
 
         circle.id = id;
 
+        canvas.add(circle, tooltip);
+
+        circle.on('mouseover', function (options) {
+            tooltip.set({
+                left: left, // Ajusta la posición del tooltip relativa al cursor
+                top: top, // Ajusta la posición del tooltip relativa al cursor
+                visible: true // Hace visible el tooltip
+            });
+            canvas.bringToFront(tooltip); // Mueve el tooltip al frente
+            canvas.renderAll();
+        });
+
+        circle.on('mouseout', function (options) {
+            tooltip.set('visible', false); // Oculta el tooltip al salir del círculo
+            canvas.renderAll();
+        });
+
         circle.on('mousedown', function (options) {
             console.log('available con id:', id);
         });
-        // Agrega el circulo al grupo 
-        canvas.add(circle)
-        // Renderiza el lienzo
-        canvas.renderAll();
     }
 
     else if (type === "occupied") {
@@ -179,14 +203,31 @@ const createCircle = (canvas, type, color = '#1796FF', top, left, selectable = f
             top: top,
             originX: 'center',
             originY: 'center',
-            selectable: selectable
+            selectable: selectable,
+            hoverCursor: 'pointer'
         });
 
         circleGroup.id = id;
 
+        circleGroup.on('mouseover', function (options) {
+            tooltip.set({
+                left: left, 
+                top: top, 
+                visible: true 
+            });
+            canvas.bringToFront(tooltip);
+            canvas.renderAll();
+        });
+
+        circleGroup.on('mouseout', function (options) {
+            tooltip.set('visible', false); 
+            canvas.renderAll();
+        });
+
         circleGroup.on('mousedown', function (options) {
             console.log('occupied con id:', id);
         });
+
         // Agrega el grupo de circulos al lienzo
         canvas.add(circleGroup)
         // Renderiza el lienzo
@@ -206,9 +247,6 @@ const createCircle = (canvas, type, color = '#1796FF', top, left, selectable = f
             originY: 'center'
         });
 
-        // Crea un círculo blanco para simular el fondo detrás del rectángulo
-
-
         // Crea un rectángulo en la mitad del círculo con fondo blanco
         const rectangle = new fabric.Rect({
             width: 12,
@@ -225,10 +263,26 @@ const createCircle = (canvas, type, color = '#1796FF', top, left, selectable = f
             top: top,
             originX: 'center',
             originY: 'center',
-            selectable: selectable
+            selectable: selectable,
+            hoverCursor: 'pointer'
         });
 
         group.id = id;
+
+        group.on('mouseover', function (options) {
+            tooltip.set({
+                left: left, 
+                top: top, 
+                visible: true 
+            });
+            canvas.bringToFront(tooltip);
+            canvas.renderAll();
+        });
+
+        group.on('mouseout', function (options) {
+            tooltip.set('visible', false); 
+            canvas.renderAll();
+        });
 
         group.on('mousedown', function (options) {
             console.log('offline con id:', id);
@@ -240,6 +294,7 @@ const createCircle = (canvas, type, color = '#1796FF', top, left, selectable = f
 
 function createHub(canvas, top, left) {
     const id = generateUniqueId();
+
     let svgCode = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="33" viewBox="0 0 25 33" fill="none" style="&#10;    background-color: black;&#10;">
     <g id="Group 671">
     <g id="Group 601">
@@ -255,11 +310,37 @@ function createHub(canvas, top, left) {
     </g>
     </svg>`
 
+    const tooltip = new fabric.Text(`Hub #${id}`, {
+        fontFamily: 'Arial',
+        fontSize: 15,
+        fill: 'black',
+        backgroundColor: 'yellow',
+        cornerSize: 25,
+        selectable: false,
+        visible: false,
+        hoverCursor: 'default'
+    });
+
     fabric.loadSVGFromString(svgCode, function (objects, options) {
         const obj = fabric.util.groupSVGElements(objects, options);
-        obj.set({ left: left, top: top, originX: 'center', originY: 'center', selectable: false });
+        obj.set({ left: left, top: top, originX: 'center', originY: 'center', selectable: false, hoverCursor: 'default' });
 
         obj.id = id;
+
+        obj.on('mouseover', function (options) {
+            tooltip.set({
+                left: left, 
+                top: top, 
+                visible: true 
+            });
+            canvas.bringToFront(tooltip);
+            canvas.renderAll();
+        });
+
+        obj.on('mouseout', function (options) {
+            tooltip.set('visible', false); 
+            canvas.renderAll();
+        });
 
         obj.on('mousedown', function (options) {
             console.log('hub con id:', id);
@@ -271,8 +352,19 @@ function createHub(canvas, top, left) {
 }
 
 function createGroup(canvas, top, left, type, fillColor = '#1796FF') {
-
+    const id = generateUniqueId();
     let svgCode;
+
+    const tooltip = new fabric.Text(`Group ${type} #${id}`, {
+        fontFamily: 'Arial',
+        fontSize: 15,
+        fill: 'black',
+        backgroundColor: 'yellow',
+        cornerSize: 25,
+        selectable: false,
+        visible: false,
+        hoverCursor: 'default'
+    });
 
     if (type === 'available') {
         svgCode = `<svg xmlns="http://www.w3.org/2000/svg" width="35" height="33" viewBox="0 0 35 33" fill="none">
@@ -290,7 +382,12 @@ function createGroup(canvas, top, left, type, fillColor = '#1796FF') {
 
     fabric.loadSVGFromString(svgCode, function (objects, options) {
         const obj = fabric.util.groupSVGElements(objects, options);
-        obj.set({ left: left, top: top, originX: 'center', originY: 'center' });
+        obj.set({
+            left: left,
+            top: top,
+            originX: 'center',
+            originY: 'center',
+        });
 
         // Crea el texto encima del objeto SVG
         const text = new fabric.Text('0/4', {
@@ -321,7 +418,30 @@ function createGroup(canvas, top, left, type, fillColor = '#1796FF') {
             top: top, // Posición ajustada para colocar el texto encima del SVG
             originX: 'center',
             originY: 'center',
+            hoverCursor: 'default',
             selectable: false
+        });
+
+
+        group.id = id;
+
+        group.on('mouseover', function (options) {
+            tooltip.set({
+                left: left, 
+                top: top, 
+                visible: true 
+            });
+            canvas.bringToFront(tooltip);
+            canvas.renderAll();
+        });
+
+        group.on('mouseout', function (options) {
+            tooltip.set('visible', false); 
+            canvas.renderAll();
+        });
+
+        group.on('mousedown', function (options) {
+            console.log('group con id:', id);
         });
 
         canvas.add(group); // Agrega el fondo del texto al lienzo
@@ -339,26 +459,6 @@ setBackground(bgUrl, canvas)
 
 
 // Creacion de los puntos!
-
-createGroup(canvas, 74, 105, 'available');
-createGroup(canvas, 108, 80, 'available');
-
-createGroup(canvas, 180, 105, 'available');
-createGroup(canvas, 220, 105, 'available');
-createGroup(canvas, 198, 318, 'occupied', '#42CD00');
-createGroup(canvas, 208, 504, 'occupied', '#42CD00');
-createGroup(canvas, 90, 619, 'available', '#FF6262');
-createGroup(canvas, 102, 699, 'available', '#FF6262');
-
-createGroup(canvas, 255, 58, 'occupied');
-createGroup(canvas, 345, 90, 'available');
-createGroup(canvas, 420, 86, 'available');
-createGroup(canvas, 420, 163, 'available');
-createGroup(canvas, 380, 163, 'occupied');
-createGroup(canvas, 407, 220, 'available');
-createGroup(canvas, 327, 174, 'occupied');
-createGroup(canvas, 327, 228, 'occupied');
-
 createCircle(canvas, 'occupied', undefined, 70, 165);
 createCircle(canvas, 'occupied', undefined, 70, 298);
 createCircle(canvas, 'occupied', undefined, 70, 234);
@@ -403,6 +503,25 @@ createCircle(canvas, 'occupied', undefined, 158, 780);
 createCircle(canvas, 'occupied', '#96EC6D', 186, 780);
 createCircle(canvas, 'occupied', '#96EC6D', 214, 780);
 createCircle(canvas, 'available', undefined, 240, 780);
+
+createGroup(canvas, 74, 105, 'available');
+createGroup(canvas, 108, 80, 'available');
+
+createGroup(canvas, 180, 105, 'available');
+createGroup(canvas, 220, 105, 'available');
+createGroup(canvas, 198, 318, 'occupied', '#42CD00');
+createGroup(canvas, 208, 504, 'occupied', '#42CD00');
+createGroup(canvas, 90, 619, 'available', '#FF6262');
+createGroup(canvas, 102, 699, 'available', '#FF6262');
+
+createGroup(canvas, 255, 58, 'occupied');
+createGroup(canvas, 345, 90, 'available');
+createGroup(canvas, 420, 86, 'available');
+createGroup(canvas, 420, 163, 'available');
+createGroup(canvas, 380, 163, 'occupied');
+createGroup(canvas, 407, 220, 'available');
+createGroup(canvas, 327, 174, 'occupied');
+createGroup(canvas, 327, 228, 'occupied');
 
 createHub(canvas, 85, 650);
 createHub(canvas, 627, 269);
@@ -468,7 +587,7 @@ const objects = canvas.getObjects();
 
 // Recorre cada objeto y hace un console.log de sus propiedades
 objects.forEach((obj) => {
-    if(obj.id){
+    if (obj.id) {
         console.log('Tipo:', obj.type); // Tipo de objeto (círculo, rectángulo, etc.)
         console.log('ID:', obj.id); // ID del objeto, si se asignó anteriormente
         console.log('Posición (left, top):', obj.left, obj.top); // Posición izquierda y superior del objeto

@@ -238,7 +238,39 @@ const createCircle = (canvas, type, color = '#1796FF', top, left, selectable = f
     }
 }
 
-function crearSVGEnFabric(canvas, top, left, type, fillColor = '#1796FF') {
+function createHub(canvas, top, left) {
+    const id = generateUniqueId();
+    let svgCode = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="33" viewBox="0 0 25 33" fill="none" style="&#10;    background-color: black;&#10;">
+    <g id="Group 671">
+    <g id="Group 601">
+    <path id="Polygon 1" d="M12.7391 32.9265L3.76445 20.5949L21.8064 20.5949L12.7391 32.9265Z" fill="#B748FB"/>
+    <circle id="Ellipse 16" cx="12.7371" cy="12.843" r="11.8993" transform="rotate(-180 12.7371 12.843)" fill="#B748FB"/>
+    </g>
+    <circle id="Ellipse 17" cx="9.78859" cy="17.8193" r="1.79231" fill="white"/>
+    <circle id="Ellipse 18" cx="15.9706" cy="17.8193" r="1.79231" fill="white"/>
+    <circle id="Ellipse 19" cx="15.9709" cy="7.86687" r="1.79231" transform="rotate(180 15.9709 7.86687)" fill="white"/>
+    <circle id="Ellipse 20" cx="9.78893" cy="7.86687" r="1.79231" transform="rotate(180 9.78893 7.86687)" fill="white"/>
+    <circle id="Ellipse 21" cx="18.6656" cy="12.8432" r="1.79231" transform="rotate(-60 18.6656 12.8432)" fill="white"/>
+    <circle id="Ellipse 22" cx="6.90579" cy="12.843" r="1.79231" transform="rotate(120 6.90579 12.843)" fill="white"/>
+    </g>
+    </svg>`
+
+    fabric.loadSVGFromString(svgCode, function (objects, options) {
+        const obj = fabric.util.groupSVGElements(objects, options);
+        obj.set({ left: left, top: top, originX: 'center', originY: 'center', selectable: false });
+
+        obj.id = id;
+
+        obj.on('mousedown', function (options) {
+            console.log('hub con id:', id);
+        });
+
+        canvas.add(obj);
+        canvas.renderAll(); // Renderiza el lienzo
+    });
+}
+
+function createGroup(canvas, top, left, type, fillColor = '#1796FF') {
 
     let svgCode;
 
@@ -297,30 +329,7 @@ function crearSVGEnFabric(canvas, top, left, type, fillColor = '#1796FF') {
     });
 }
 
-function createHub(canvas, top, left) {
-    let svgCode = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="33" viewBox="0 0 25 33" fill="none" style="&#10;    background-color: black;&#10;">
-    <g id="Group 671">
-    <g id="Group 601">
-    <path id="Polygon 1" d="M12.7391 32.9265L3.76445 20.5949L21.8064 20.5949L12.7391 32.9265Z" fill="#B748FB"/>
-    <circle id="Ellipse 16" cx="12.7371" cy="12.843" r="11.8993" transform="rotate(-180 12.7371 12.843)" fill="#B748FB"/>
-    </g>
-    <circle id="Ellipse 17" cx="9.78859" cy="17.8193" r="1.79231" fill="white"/>
-    <circle id="Ellipse 18" cx="15.9706" cy="17.8193" r="1.79231" fill="white"/>
-    <circle id="Ellipse 19" cx="15.9709" cy="7.86687" r="1.79231" transform="rotate(180 15.9709 7.86687)" fill="white"/>
-    <circle id="Ellipse 20" cx="9.78893" cy="7.86687" r="1.79231" transform="rotate(180 9.78893 7.86687)" fill="white"/>
-    <circle id="Ellipse 21" cx="18.6656" cy="12.8432" r="1.79231" transform="rotate(-60 18.6656 12.8432)" fill="white"/>
-    <circle id="Ellipse 22" cx="6.90579" cy="12.843" r="1.79231" transform="rotate(120 6.90579 12.843)" fill="white"/>
-    </g>
-    </svg>`
 
-    fabric.loadSVGFromString(svgCode, function (objects, options) {
-        const obj = fabric.util.groupSVGElements(objects, options);
-        obj.set({ left: left, top: top, originX: 'center', originY: 'center', selectable: false });
-
-        canvas.add(obj);
-        canvas.renderAll(); // Renderiza el lienzo
-    });
-}
 
 
 const canvas = initCanvas('canvas')
@@ -330,27 +339,25 @@ setBackground(bgUrl, canvas)
 
 
 // Creacion de los puntos!
-createHub(canvas, 85, 650)
-createHub(canvas, 627, 269)
 
-crearSVGEnFabric(canvas, 74, 105, 'available');
-crearSVGEnFabric(canvas, 108, 80, 'available');
+createGroup(canvas, 74, 105, 'available');
+createGroup(canvas, 108, 80, 'available');
 
-crearSVGEnFabric(canvas, 180, 105, 'available');
-crearSVGEnFabric(canvas, 220, 105, 'available');
-crearSVGEnFabric(canvas, 198, 318, 'occupied', '#42CD00');
-crearSVGEnFabric(canvas, 208, 504, 'occupied', '#42CD00');
-crearSVGEnFabric(canvas, 90, 619, 'available', '#FF6262');
-crearSVGEnFabric(canvas, 102, 699, 'available', '#FF6262');
+createGroup(canvas, 180, 105, 'available');
+createGroup(canvas, 220, 105, 'available');
+createGroup(canvas, 198, 318, 'occupied', '#42CD00');
+createGroup(canvas, 208, 504, 'occupied', '#42CD00');
+createGroup(canvas, 90, 619, 'available', '#FF6262');
+createGroup(canvas, 102, 699, 'available', '#FF6262');
 
-crearSVGEnFabric(canvas, 255, 58, 'occupied');
-crearSVGEnFabric(canvas, 345, 90, 'available');
-crearSVGEnFabric(canvas, 420, 86, 'available');
-crearSVGEnFabric(canvas, 420, 163, 'available');
-crearSVGEnFabric(canvas, 380, 163, 'occupied');
-crearSVGEnFabric(canvas, 407, 220, 'available');
-crearSVGEnFabric(canvas, 327, 174, 'occupied');
-crearSVGEnFabric(canvas, 327, 228, 'occupied');
+createGroup(canvas, 255, 58, 'occupied');
+createGroup(canvas, 345, 90, 'available');
+createGroup(canvas, 420, 86, 'available');
+createGroup(canvas, 420, 163, 'available');
+createGroup(canvas, 380, 163, 'occupied');
+createGroup(canvas, 407, 220, 'available');
+createGroup(canvas, 327, 174, 'occupied');
+createGroup(canvas, 327, 228, 'occupied');
 
 createCircle(canvas, 'occupied', undefined, 70, 165);
 createCircle(canvas, 'occupied', undefined, 70, 298);
@@ -396,6 +403,9 @@ createCircle(canvas, 'occupied', undefined, 158, 780);
 createCircle(canvas, 'occupied', '#96EC6D', 186, 780);
 createCircle(canvas, 'occupied', '#96EC6D', 214, 780);
 createCircle(canvas, 'available', undefined, 240, 780);
+
+createHub(canvas, 85, 650);
+createHub(canvas, 627, 269);
 
 
 canvas.on('mouse:wheel', function (opt) {
@@ -458,11 +468,13 @@ const objects = canvas.getObjects();
 
 // Recorre cada objeto y hace un console.log de sus propiedades
 objects.forEach((obj) => {
-    console.log('Tipo:', obj.type); // Tipo de objeto (círculo, rectángulo, etc.)
-    console.log('ID:', obj.id); // ID del objeto, si se asignó anteriormente
-    console.log('Posición (left, top):', obj.left, obj.top); // Posición izquierda y superior del objeto
-    console.log('Dimensiones (width, height):', obj.width, obj.height); // Dimensiones del objeto (si tiene)
-    console.log('-------');
+    if(obj.id){
+        console.log('Tipo:', obj.type); // Tipo de objeto (círculo, rectángulo, etc.)
+        console.log('ID:', obj.id); // ID del objeto, si se asignó anteriormente
+        console.log('Posición (left, top):', obj.left, obj.top); // Posición izquierda y superior del objeto
+        console.log('Dimensiones (width, height):', obj.width, obj.height); // Dimensiones del objeto (si tiene)
+        console.log('-------');
+    }
 });
 
 

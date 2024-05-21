@@ -13,13 +13,13 @@
     <div class="toolkit">
         <button onclick="createRect(canvas)">Square</button>
         <button onclick="createCircle(canvas, 'available', undefined, canvCenter.top, canvCenter.left, true)" class="circle">Circle</button>
-        <button onclick="hideAllObjects(canvas, true)">Ocultar</button>
-        <button onclick="hideAllObjects(canvas, false)">Mostrar</button>
-        <!-- <button onclick="clearCanvas(canvas, svgState)">Clear</button>
-        <button onclick="restoreCanvas(canvas, svgState, bgUrl)">Restore</button> -->
+        <button onclick="hideAllObjects(canvas, true)">Hide</button>
+        <button onclick="hideAllObjects(canvas, false)">Show</button>
         <button onclick="setBackgroundOpacity(canvas, 1)">Opacity Normal</button>
         <button onclick="setBackgroundOpacity(canvas, 0.5)">Opacity 50%</button>
         <button onclick="resetCanvasPosition()">Reset position</button>
+        <!-- <button onclick="clearCanvas(canvas, svgState)">Clear</button>
+        <button onclick="restoreCanvas(canvas, svgState, bgUrl)">Restore</button> -->
     </div>
 
     <canvas id="canvas"></canvas>
@@ -28,6 +28,8 @@
         <button id="zoomOut" onclick="zoomOut()">-</button>
     </div>
 
+
+    <!-- Se importa fabricJs -->
     <script src="https://unpkg.com/fabric@5.3.0/dist/fabric.min.js"></script>
     <script src="index.js"></script>
 </body>
